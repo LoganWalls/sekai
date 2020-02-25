@@ -2,7 +2,7 @@ from time import sleep
 
 from asciimatics.screen import Screen
 
-from .render import AsciimaticsRenderer, Renderer
+from .render import Renderer
 from .state import State
 
 __all__ = ["Engine", "AsciimaticsEngine", "EpisodeTerminated"]
@@ -32,23 +32,23 @@ class Engine(object):
                 self.state.terminal_state = True
             if self.renderer:
                 self.render(self.state)
-            sleep(wait_time)
+            if wait_time:
+                sleep(wait_time)
 
 
 class AsciimaticsEngine(Engine):
 
     def __init__(self, state: State, **kwargs):
         super().__init__(state, **kwargs)
-        if not self.renderer:
-            self.renderer = AsciimaticsRenderer()
         self.screen: Screen = None
 
     def render(self, state: State):
         self.renderer.render_state(state, screen=self.screen)
 
     def run(self, wait_time: float = 0.5):
-        self.screen = Screen.open()
-        self.screen.clear()
+        if self.renderer:
+            self.screen = Screen.open()
+            self.screen.clear()
         try:
             while not self.state.terminal_state:
                 try:
@@ -57,6 +57,8 @@ class AsciimaticsEngine(Engine):
                     self.state.terminal_state = True
                 if self.renderer:
                     self.render(self.state)
-                sleep(wait_time)
+                if wait_time:
+                    sleep(wait_time)
         finally:
-            self.screen.close()
+            if self.renderer:
+                self.screen.close()

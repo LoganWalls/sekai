@@ -122,4 +122,4 @@ if __name__ == '__main__':
     state.agent_pos = (2, 2)
 
     engine = AsciimaticsEngine(state, renderer=AsciimaticsRenderer())
-    engine.run()
+    engine.run(wait_time=0.5)
